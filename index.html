@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Playbook Sorter | Mercado Libre</title>
+<link href="https://fonts.googleapis.com/css2?family=Raleway:wght@400;600;700;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --yellow: #FFE600; --yellow-dark: #E6CF00;
+  --blue: #3483FA; --blue-dark: #2968C8; --blue-deeper: #1A4F9E;
+  --blue-light: #EBF3FF; --text: #333333;
+  --gray: #717171; --border: #EBEBEB; --white: #FFFFFF;
+  --green: #00A650; --green-dark: #007A3D; --green-light: #E8F8EF;
+  --purple: #6C3FC5; --purple-light: #F0EAFB;
+  --indigo: #3949AB; --indigo-light: #E8EAF6;
+}
+body { font-family: 'Inter', sans-serif; background: #F0F0F0; color: var(--text); min-height: 100vh; }
+header { background: var(--yellow); height: 60px; padding: 0 2rem; display: flex; align-items: center; justify-content: space-between; position: sticky; top: 0; z-index: 100; border-bottom: 2px solid var(--yellow-dark); }
+.logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.logo-mark { width: 36px; height: 36px; background: var(--blue); border-radius: 8px; display: flex; align-items: center; justify-content: center; }
+.logo-mark svg { width: 20px; height: 20px; }
+.logo-name { font-family: 'Raleway', sans-serif; font-weight: 800; font-size: 17px; color: var(--blue-deeper); }
+.logo-sub { font-size: 10px; font-weight: 600; color: var(--blue-dark); letter-spacing: 1px; text-transform: uppercase; margin-top: 1px; }
+.header-right { display: flex; align-items: center; gap: 10px; }
+.lang-link { font-size: 12px; font-weight: 600; color: var(--blue-deeper); text-decoration: none; background: rgba(255,255,255,0.7); padding: 5px 14px; border-radius: 20px; border: 1px solid var(--yellow-dark); transition: background .15s; }
+.lang-link:hover { background: white; }
+.badge-header { background: var(--blue); color: var(--yellow); font-family: 'Raleway', sans-serif; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 20px; }
+.hero { background: var(--yellow); padding: 3rem 2rem 2.5rem; text-align: center; border-bottom: 3px solid var(--yellow-dark); position: relative; overflow: hidden; }
+.hero::before { content: ''; position: absolute; inset: 0; background: repeating-linear-gradient(-45deg, transparent, transparent 40px, rgba(255,255,255,0.08) 40px, rgba(255,255,255,0.08) 80px); pointer-events: none; }
+.hero-eyebrow { display: inline-flex; align-items: center; gap: 8px; font-size: 11px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--blue); margin-bottom: 14px; background: rgba(52,131,250,0.1); padding: 5px 16px; border-radius: 20px; }
+.hero h1 { font-family: 'Raleway', sans-serif; font-size: clamp(28px, 5vw, 48px); font-weight: 900; color: var(--blue-deeper); letter-spacing: -1px; line-height: 1.1; margin-bottom: 10px; }
+.hero h1 span { background: var(--indigo); color: white; padding: 2px 10px; border-radius: 6px; display: inline-block; }
+.hero-sub { font-size: 15px; color: var(--blue-dark); opacity: 0.8; max-width: 460px; margin: 0 auto; line-height: 1.6; }
+.breadcrumb-bar { background: var(--white); border-bottom: 1px solid var(--border); padding: 0.75rem 2rem; display: flex; align-items: center; gap: 8px; font-size: 13px; flex-wrap: wrap; min-height: 44px; }
+.bc-item { display: flex; align-items: center; gap: 8px; }
+.bc-link { color: var(--blue); text-decoration: none; font-weight: 500; cursor: pointer; background: none; border: none; font-size: 13px; font-family: inherit; padding: 0; transition: color .15s; }
+.bc-link:hover { color: var(--blue-deeper); text-decoration: underline; }
+.bc-sep { color: var(--gray); font-size: 11px; }
+.bc-current { color: var(--gray); font-weight: 600; }
+.container { max-width: 920px; margin: 0 auto; padding: 2.5rem 1.5rem 5rem; }
+.back-btn { display: none; align-items: center; gap: 6px; background: none; border: none; font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 600; color: var(--blue); cursor: pointer; padding: 0; margin-bottom: 1.25rem; transition: color .15s; }
+.back-btn:hover { color: var(--blue-deeper); }
+.back-btn.visible { display: flex; }
+.back-btn-arrow { width: 26px; height: 26px; background: var(--blue-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; transition: transform .15s; }
+.back-btn:hover .back-btn-arrow { transform: translateX(-3px); }
+.level-panel { display: none; }
+.level-panel.active { display: block; animation: fadeUp .35s ease both; }
+.level-header { margin-bottom: 1.75rem; }
+.level-label { display: inline-flex; align-items: center; gap: 8px; font-family: 'Raleway', sans-serif; font-size: 12px; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: white; margin-bottom: 0.6rem; background: var(--indigo); padding: 5px 14px; border-radius: 20px; border: 1px solid rgba(57,73,171,0.4); }
+.level-title { font-family: 'Raleway', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; color: var(--gray); display: flex; align-items: center; gap: 10px; }
+.level-title::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 22px; }
+.tool-card { background: var(--white); border-radius: 16px; border: 1px solid var(--border); overflow: hidden; text-decoration: none; display: flex; flex-direction: column; transition: transform .2s, box-shadow .2s; cursor: pointer; animation: fadeUp .4s ease both; }
+.tool-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(57,73,171,0.13); border-color: var(--indigo); }
+.card-top { padding: 2rem 1.5rem 1.5rem; position: relative; overflow: hidden; background: var(--indigo); }
+.card-top.blue { background: var(--blue); }
+.card-top.purple { background: var(--purple); }
+.card-top::after { content: ''; position: absolute; bottom: -20px; right: -20px; width: 80px; height: 80px; border-radius: 50%; background: rgba(255,255,255,0.07); }
+.card-top::before { content: ''; position: absolute; top: -30px; left: 60%; width: 120px; height: 120px; border-radius: 50%; background: rgba(255,255,255,0.05); }
+.card-emoji { font-size: 38px; display: block; margin-bottom: 12px; line-height: 1; }
+.card-title { font-family: 'Raleway', sans-serif; font-size: 21px; font-weight: 800; color: white; letter-spacing: -0.3px; line-height: 1.2; margin-bottom: 6px; }
+.card-top.blue .card-title { color: var(--yellow); }
+.card-subtitle { font-size: 12px; color: rgba(255,255,255,0.65); line-height: 1.4; }
+.card-bottom { padding: 1.25rem 1.5rem; flex: 1; display: flex; flex-direction: column; gap: 12px; }
+.card-desc { font-size: 13px; color: var(--gray); line-height: 1.6; flex: 1; }
+.card-tags { display: flex; gap: 6px; flex-wrap: wrap; }
+.tag { font-size: 11px; font-weight: 500; padding: 3px 10px; border-radius: 20px; background: var(--indigo-light); color: var(--indigo); }
+.tag.blue { background: var(--blue-light); color: var(--blue-dark); }
+.tag.purple { background: var(--purple-light); color: var(--purple); }
+.card-cta { display: flex; align-items: center; justify-content: space-between; padding-top: 12px; border-top: 1px solid var(--border); }
+.cta-text { font-size: 13px; font-weight: 600; color: var(--indigo); }
+.cta-text.blue { color: var(--blue); }
+.cta-text.purple { color: var(--purple); }
+.cta-arrow { width: 28px; height: 28px; background: var(--indigo); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-size: 14px; transition: transform .15s; }
+.cta-arrow.blue { background: var(--blue); }
+.cta-arrow.purple { background: var(--purple); }
+.tool-card:hover .cta-arrow { transform: translateX(3px); }
+footer { background: var(--yellow); border-top: 2px solid var(--yellow-dark); padding: 1.25rem 2rem; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+.footer-brand { font-family: 'Raleway', sans-serif; font-size: 13px; font-weight: 700; color: var(--blue-deeper); }
+.footer-note { font-size: 12px; color: var(--blue-dark); opacity: 0.7; }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+.tool-card:nth-child(1) { animation-delay: .04s; }
+.tool-card:nth-child(2) { animation-delay: .12s; }
+@media (max-width: 600px) { .cards-grid { grid-template-columns: 1fr; } .breadcrumb-bar { font-size: 12px; } }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="logo" href="https://mtmtransportes-paginainicialpt.vercel.app/">
+    <div class="logo-mark"><svg viewBox="0 0 20 20" fill="none"><circle cx="10" cy="6.5" r="3.5" fill="#FFE600"/><path d="M2.5 17.5c0-4.142 3.358-7.5 7.5-7.5s7.5 3.358 7.5 7.5" stroke="#FFE600" stroke-width="2.2" stroke-linecap="round"/></svg></div>
+    <div><div class="logo-name">Mercado Libre</div><div class="logo-sub">Ferramentas Internas</div></div>
+  </a>
+  <div class="header-right">
+    <a class="lang-link" href="https://mtmtransportes-paginainicialpt.vercel.app/">‹ Início</a>
+    <a class="lang-link" href="sorter-single-es.html">🇪🇸 Español</a>
+    <span class="badge-header">MTM</span>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="hero-eyebrow">⚙️ Classificação Automática</div>
+  <h1>Playbook <span>Sorter</span></h1>
+  <p class="hero-sub">Guias de implementação e operação do Sorter automático para Service Center e Cross Docking.</p>
+</div>
+
+<div class="breadcrumb-bar" id="breadcrumb"></div>
+
+<div class="container">
+
+  <button class="back-btn" id="back-btn" onclick="goBack()">
+    <div class="back-btn-arrow">←</div>
+    <span id="back-label">Voltar</span>
+  </button>
+
+  <!-- ══ LEVEL 0: root ══ -->
+  <div class="level-panel active" id="panel-root">
+    <div class="level-header"><div class="level-label">⚙️ Playbook Sorter</div></div>
+    <div class="level-title">Selecione a operação</div><br>
+    <div class="cards-grid">
+
+      <a class="tool-card" href="LINK_PLAYBOOK_SORTER_SVC_PT">
+        <div class="card-top blue">
+          <span class="card-emoji">🏪</span>
+          <div class="card-title">SVC — Service Center</div>
+          <div class="card-subtitle">Sorter · Service Center</div>
+        </div>
+        <div class="card-bottom">
+          <p class="card-desc">Acesse o playbook completo do Sorter automático para Service Center: especificações técnicas, padrões de operação e guias de implementação MTM.</p>
+          <div class="card-tags">
+            <span class="tag blue">Automação</span>
+            <span class="tag blue">Classificação</span>
+            <span class="tag blue">SVC</span>
+          </div>
+          <div class="card-cta"><span class="cta-text blue">Abrir playbook</span><div class="cta-arrow blue">→</div></div>
+        </div>
+      </a>
+
+      <a class="tool-card" href="LINK_PLAYBOOK_SORTER_XD_PT">
+        <div class="card-top purple">
+          <span class="card-emoji">🔄</span>
+          <div class="card-title">XD — Cross Docking</div>
+          <div class="card-subtitle">Sorter · Cross Docking</div>
+        </div>
+        <div class="card-bottom">
+          <p class="card-desc">Acesse o playbook completo do Sorter automático para Cross Docking: especificações técnicas, padrões de operação e guias de implementação MTM.</p>
+          <div class="card-tags">
+            <span class="tag purple">Automação</span>
+            <span class="tag purple">Classificação</span>
+            <span class="tag purple">XD</span>
+          </div>
+          <div class="card-cta"><span class="cta-text purple">Abrir playbook</span><div class="cta-arrow purple">→</div></div>
+        </div>
+      </a>
+
+    </div>
+  </div>
+
+</div>
+
+<footer>
+  <div class="footer-brand">Mercado Libre — MTM</div>
+  <div class="footer-note">Ferramentas de Planejamento Operacional</div>
+</footer>
+
+<script>
+const TREE = {
+  root: { label: 'Playbook Sorter', parent: null },
+};
+let current = 'root';
+function getAncestors(id) {
+  const path = []; let node = id;
+  while (node) { path.unshift(node); node = TREE[node]?.parent; }
+  return path;
+}
+function renderBreadcrumb(id) {
+  const bc = document.getElementById('breadcrumb');
+  const ancestors = getAncestors(id);
+  let html = `<div class="bc-item"><a class="bc-link" href="https://mtmtransportes-paginainicialpt.vercel.app/">‹ Início</a><span class="bc-sep">›</span></div>`;
+  ancestors.forEach((nodeId, i) => {
+    const isLast = i === ancestors.length - 1;
+    const label = TREE[nodeId].label;
+    if (isLast) {
+      html += `<span class="bc-current">${label}</span>`;
+    } else {
+      html += `<div class="bc-item"><button class="bc-link" onclick="goTo('${nodeId}')">${label}</button><span class="bc-sep">›</span></div>`;
+    }
+  });
+  bc.innerHTML = html;
+}
+function updateBackBtn(id) {
+  const btn = document.getElementById('back-btn');
+  const lbl = document.getElementById('back-label');
+  const parent = TREE[id]?.parent;
+  if (!parent) { btn.classList.remove('visible'); }
+  else { btn.classList.add('visible'); lbl.textContent = 'Voltar para ' + TREE[parent].label; }
+}
+function goTo(id) {
+  document.getElementById('panel-' + current)?.classList.remove('active');
+  document.getElementById('panel-' + id)?.classList.add('active');
+  current = id;
+  renderBreadcrumb(id);
+  updateBackBtn(id);
+  window.scrollTo({ top: document.querySelector('.breadcrumb-bar').offsetTop - 64, behavior: 'smooth' });
+}
+function goBack() {
+  const parent = TREE[current]?.parent;
+  if (parent) goTo(parent);
+}
+renderBreadcrumb('root');
+updateBackBtn('root');
+</script>
+</body>
+</html>
